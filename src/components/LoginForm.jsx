@@ -13,6 +13,10 @@ export default function LoginForm() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
+  // Google Sheet details
+  const sheetId = '1tpKmn957d-nuxtKgcRGPkTh5NL2i33guyuS32l-sAEA'
+  const masterSheetName = 'Master'
+
   const handleLogin = async (e) => {
     e.preventDefault()
     setIsLoading(true)
@@ -29,23 +33,73 @@ export default function LoginForm() {
         return
       }
 
-      // Check credentials (in a real app, this would be an API call)
-      if (username === "admin" && password === "admin123") {
-        // Admin login
-        await login({ id: "1", username, role: "admin", name: "Admin User" })
-        toast({
-          title: "Welcome Admin",
-          description: "You have successfully logged in as an administrator",
+      // Fetch credentials from Master sheet
+      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(masterSheetName)}`
+      
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Master sheet data: ${response.status}`)
+      }
+      
+      // Extract JSON data from the response
+      const text = await response.text()
+      
+      const jsonStart = text.indexOf('{')
+      const jsonEnd = text.lastIndexOf('}')
+      
+      if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error("Invalid response format from Master Sheets")
+      }
+      
+      const jsonString = text.substring(jsonStart, jsonEnd + 1)
+      const data = JSON.parse(jsonString)
+
+      // Check credentials
+      let validCredentials = false
+      let userRole = null
+      let userName = null
+
+      if (data.table && data.table.rows) {
+        for (let i = 1; i < data.table.rows.length; i++) {
+          const row = data.table.rows[i]
+          
+          // Check if row has sufficient columns
+          if (row.c && row.c[3] && row.c[4] && row.c[5]) {
+            const sheetUsername = row.c[3].v ? row.c[3].v.toString().trim() : ''
+            const sheetPassword = row.c[4].v ? row.c[4].v.toString().trim() : ''
+            const sheetUserType = row.c[5].v ? row.c[5].v.toString().trim() : ''
+            const sheetName = row.c[0].v ? row.c[0].v.toString().trim() : 'User'
+
+            if (sheetUsername === username && sheetPassword === password) {
+              validCredentials = true
+              userRole = sheetUserType.toLowerCase() === 'admin' ? 'admin' : 'user'
+              userName = sheetName
+              break
+            }
+          }
+        }
+      }
+
+      if (validCredentials) {
+        // Login successful
+        await login({ 
+          id: username, 
+          username, 
+          role: userRole, 
+          name: userName 
         })
-        navigate("/ims")
-      } else if (username === "user" && password === "user123") {
-        // Regular user login
-        await login({ id: "2", username, role: "user", name: "Regular User" })
+        
         toast({
           title: "Welcome",
-          description: "You have successfully logged in",
+          description: `You have successfully logged in as a ${userRole}`,
         })
-        navigate("/dashboard")
+
+        // Navigate based on role
+        if (userRole === 'admin') {
+          navigate("/ims")
+        } else {
+          navigate("/dashboard")
+        }
       } else {
         // Invalid credentials
         toast({
@@ -55,6 +109,7 @@ export default function LoginForm() {
         })
       }
     } catch (error) {
+      console.error("Login error:", error)
       toast({
         title: "Error",
         description: "An error occurred during login",
@@ -119,9 +174,6 @@ export default function LoginForm() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-            </div>
-            <div className="text-xs text-gray-500">
-              <span className="font-medium">Demo credentials:</span> admin/admin123 or user/user123
             </div>
           </div>
 

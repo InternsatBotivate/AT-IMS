@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
+import PropTypes from 'prop-types'
 
 // Create context with default values
 const AuthContext = createContext({
@@ -23,8 +24,13 @@ export function AuthProvider({ children }) {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser)
-        setUser(parsedUser)
-        setIsAuthenticated(true)
+        // Validate stored user data
+        if (parsedUser && parsedUser.username && parsedUser.role) {
+          setUser(parsedUser)
+          setIsAuthenticated(true)
+        } else {
+          throw new Error("Invalid user data")
+        }
       } catch (error) {
         console.error("Failed to parse stored user:", error)
         localStorage.removeItem("user")
@@ -36,6 +42,11 @@ export function AuthProvider({ children }) {
   // Login function
   const login = async (userData) => {
     return new Promise((resolve) => {
+      // Validate user data before storing
+      if (!userData.username || !userData.role) {
+        throw new Error("Invalid user data")
+      }
+
       // Simulate API delay
       setTimeout(() => {
         setUser(userData)
@@ -55,11 +66,25 @@ export function AuthProvider({ children }) {
 
   // Provide auth context to children
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
   )
+}
+
+// PropTypes for type checking
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired
 }
 
 // Custom hook to use auth context
 export function useAuth() {
-  return useContext(AuthContext)
+  const context = useContext(AuthContext)
+  
+  // Optional: Add a check to ensure the hook is used within an AuthProvider
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  
+  return context
 }

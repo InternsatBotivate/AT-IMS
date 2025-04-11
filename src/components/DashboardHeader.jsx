@@ -28,6 +28,13 @@ export default function DashboardHeader() {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  // Determine if the current page is admin or user
+  const isAdminPage = user?.role === "admin"
+  
+  // Determine navigation links based on user role
+  const ledgerLink = isAdminPage ? "/ims" : "/transaction-history"
+  const ledgerText = isAdminPage ? "Ledger" : "History"
+
   return (
     <header className="border-b bg-white shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -86,7 +93,10 @@ export default function DashboardHeader() {
 
         {/* Navigation Items - Desktop */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link to="/ims" className="flex items-center text-gray-700 hover:text-purple-700">
+          <Link 
+            to={ledgerLink} 
+            className="flex items-center text-gray-700 hover:text-purple-700"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 mr-2"
@@ -101,7 +111,7 @@ export default function DashboardHeader() {
               <line x1="12" y1="20" x2="12" y2="4" />
               <line x1="6" y1="20" x2="6" y2="14" />
             </svg>
-            Ledger
+            {ledgerText}
           </Link>
 
           <Link to="/dashboard" className="flex items-center text-gray-700 hover:text-purple-700">
@@ -123,7 +133,7 @@ export default function DashboardHeader() {
           </Link>
 
           <div className="relative">
-            <button
+            {/* <button
               className="flex items-center text-gray-700 hover:text-purple-700"
               onClick={() => setPartiesDropdownOpen(!partiesDropdownOpen)}
             >
@@ -143,7 +153,7 @@ export default function DashboardHeader() {
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
               Parties
-            </button>
+            </button> */}
             {partiesDropdownOpen && (
               <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                 <div className="py-1">
@@ -264,7 +274,7 @@ export default function DashboardHeader() {
         <div className="md:hidden fixed inset-0 z-50 bg-white pt-16 px-4 pb-4 overflow-y-auto">
           <div className="flex flex-col space-y-4">
             <Link 
-              to="/ims" 
+              to={ledgerLink}
               className="flex items-center p-3 rounded-md hover:bg-purple-50 text-gray-700"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -282,7 +292,7 @@ export default function DashboardHeader() {
                 <line x1="12" y1="20" x2="12" y2="4" />
                 <line x1="6" y1="20" x2="6" y2="14" />
               </svg>
-              Ledger
+              {ledgerText}
             </Link>
 
             <Link 
@@ -308,7 +318,7 @@ export default function DashboardHeader() {
             </Link>
 
             <div className="border-t border-gray-100 my-2"></div>
-            
+              
             <div className="p-3">
               <h3 className="font-medium text-gray-900 mb-2">Quick Access Parties</h3>
               <div className="space-y-2">

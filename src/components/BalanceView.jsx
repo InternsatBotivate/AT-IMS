@@ -87,7 +87,7 @@ export default function BalanceView() {
         metalType,
         issuedQty: metalBalances[metalType].issuedQty,
         receiptQty: metalBalances[metalType].receiptQty,
-        balanceQty: metalBalances[metalType].issuedQty - metalBalances[metalType].receiptQty
+        balanceQty: metalBalances[metalType].receiptQty - metalBalances[metalType].issuedQty
       }))
       
       return calculatedBalances
@@ -161,7 +161,7 @@ export default function BalanceView() {
                 <th className="text-purple-700 p-3 text-right">Issue Qty (g)</th>
                 <th className="text-purple-700 p-3 text-right">Receipt Qty (g)</th>
                 <th className="text-purple-700 p-3 text-right">Balance Qty (g)</th>
-                <th className="text-purple-700 p-3 text-center">Status</th>
+                {/* <th className="text-purple-700 p-3 text-center">Status</th> */}
               </tr>
             </thead>
             <tbody>
@@ -196,7 +196,7 @@ export default function BalanceView() {
                             : "badge-destructive"
                         }`}
                       >
-                        {balance.balanceQty > 100 ? "Good Stock" : balance.balanceQty > 0 ? "Low Stock" : "Out of Stock"}
+                        {/* {balance.balanceQty > 100 ? "Good Stock" : balance.balanceQty > 0 ? "Low Stock" : "Out of Stock"} */}
                       </span>
                     </td>
                   </tr>

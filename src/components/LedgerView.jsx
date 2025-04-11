@@ -83,7 +83,7 @@ export default function LedgerView() {
       
       if (ledgerData.table && ledgerData.table.rows) {
         // Start from row 2 (index 1) to skip headers
-        for (let i = 1; i < ledgerData.table.rows.length; i++) {
+        for (let i = 0; i < ledgerData.table.rows.length; i++) {
           const row = ledgerData.table.rows[i]
           
           // Skip empty rows
@@ -224,15 +224,15 @@ export default function LedgerView() {
   )
   
   // Handle delete button click
-  const handleDelete = (name) => {
-    // TODO: Implement actual deletion from Google Sheet
+  // const handleDelete = (name) => {
+  //   // TODO: Implement actual deletion from Google Sheet
     
-    // Remove from local state
-    setLedgerData(prev => prev.filter(entry => entry.name !== name))
+  //   // Remove from local state
+  //   setLedgerData(prev => prev.filter(entry => entry.name !== name))
     
-    // Show confirmation
-    alert(`Deleted entry for ${name}`)
-  }
+  //   // Show confirmation
+  //   alert(`Deleted entry for ${name}`)
+  // }
 
   return (
     <div>
@@ -312,7 +312,7 @@ export default function LedgerView() {
                       <th className="text-indigo-700 p-3 font-bold text-right">DR</th>
                       <th className="text-indigo-700 p-3 font-bold text-right">CR</th>
                       <th className="text-indigo-700 p-3 font-bold text-right">BALANCE</th>
-                      <th className="text-indigo-700 p-3 font-bold text-center">ACTION</th>
+                      {/* <th className="text-indigo-700 p-3 font-bold text-center">ACTION</th> */}
                     </tr>
                   </thead>
                   <tbody>
@@ -330,13 +330,13 @@ export default function LedgerView() {
                           >
                             {entry.balance.toFixed(1)}
                           </td>
-                          <td className="p-3 text-center flex justify-center space-x-2">
+                          {/* <td className="p-3 text-center flex justify-center space-x-2">
                             <Link to={`/party-details/${encodeURIComponent(entry.name)}`}>
                               <button className="px-3 py-1 text-sm rounded border border-indigo-200 text-indigo-600 hover:bg-indigo-50">
                                 Details
                               </button>
-                            </Link>
-                            <button 
+                            </Link> */}
+                            {/* <button 
                               className="p-1 text-red-500 hover:bg-red-50 rounded"
                               onClick={() => handleDelete(entry.name)}
                             >
@@ -357,8 +357,8 @@ export default function LedgerView() {
                                 <line x1="10" y1="11" x2="10" y2="17"></line>
                                 <line x1="14" y1="11" x2="14" y2="17"></line>
                               </svg>
-                            </button>
-                          </td>
+                            </button> */}
+                          {/* </td> */}
                         </tr>
                       ))
                     ) : (
